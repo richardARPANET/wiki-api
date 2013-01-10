@@ -32,6 +32,6 @@ A basic python library enabling access to Wikipedia.org's search results and art
 
 ## Tests
 
-    Test .py files can be found in /tests.
+    Test .py file can be found in /test.
 
 
