@@ -17,8 +17,6 @@ A basic python library enabling access to Wikipedia.org's search results and art
 
     article = wiki.get_article(results[0])
 
-    #grab some info
-
     article.heading => 'Barack Obama' 
     article.image => 'http://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Official_portrait_of_Barack_Obama.jpg/220px-Official_portrait_of_Barack_Obama.jpg'
     article.summary => 'Barack Hussein Obama II (i/bəˈrɑːk huːˈseɪn oʊˈbɑːmə/; born August 4, 1961) is the 44th and current President of th...'
