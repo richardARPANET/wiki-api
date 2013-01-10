@@ -11,7 +11,7 @@ A basic python library enabling access to Wikipedia.org's search results and art
 
 ### Search for something on wikipedia
 
-    results = wiki.find('Barack Obama') => ['Barack_Obama', 'Barack_Obama_presidential_campaign,_2008', 'Barack_Obama_citizenship_conspiracy_theories', ...]
+    results = wiki.find('Barack Obama') => ['Barack_Obama', 'Barack_Obama_presidential_campaign,_2008', ...]
 
 ### Get information about a wiki article
 
