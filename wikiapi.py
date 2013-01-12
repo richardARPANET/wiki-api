@@ -8,7 +8,7 @@ uri_scheme = 'http'
 api_uri = 'wikipedia.org/w/api.php'
 article_uri = 'wikipedia.org/wiki/'
 
-class Api:
+class WikiApi:
 
     def __init__( self, options={} ):
         self.options = options

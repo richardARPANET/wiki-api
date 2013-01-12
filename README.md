@@ -6,8 +6,8 @@ A basic python library enabling access to Wikipedia.org's search results and art
 
 ### Create an instance of wiki-api
 
-    wiki = Api()
-    wiki = Api({ 'locale' : 'es'}) # to specify your locale, 'en' is default
+    wiki = WikiApi()
+    wiki = WikiApi({ 'locale' : 'es'}) # to specify your locale, 'en' is default
 
 ### Search for something on wikipedia
 
