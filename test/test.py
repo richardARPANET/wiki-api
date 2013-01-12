@@ -1,6 +1,6 @@
-from wikiapi import Api
+from wikiapi import  WikiApi()
 
-wiki = Api()
+wiki = WikiApi()
 results = wiki.find('Barack Obama')
 article = wiki.get_article(results[0]) #taking first search result
 
