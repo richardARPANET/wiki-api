@@ -8,6 +8,16 @@ uri_scheme = 'http'
 api_uri = 'wikipedia.org/w/api.php'
 article_uri = 'wikipedia.org/wiki/'
 
+#common sub sections to exclude from output
+unwanted_sections = [
+    'External links',
+    'Navigation menu',
+    'See also',
+    'References',
+    'Further reading',
+    'Contents'
+]
+
 class WikiApi:
 
     def __init__( self, options={} ):
@@ -53,16 +63,6 @@ class WikiApi:
         for ref in references:
             data['references'].append(self.strip_text(ref.text))
 
-        #gather full page
-        i = 0
-        min_p_len = 15
-        for p in paras:
-            if i == 0:
-                data['full'] += data['heading']
-            if len(p.text) > min_p_len:
-                data['full'] += '\n\n' + p.text
-                i += 1
-
         #gather summary
         summary_max = 900
         chars = 0
@@ -70,6 +70,16 @@ class WikiApi:
             if chars < summary_max:
                 chars += len(p.text)
                 data['summary'] += '\n\n' + self.strip_text(p.text)
+
+        #gather full content
+        i = 0
+        for line in html.find(id='firstHeading').find_all_next(['h2','p']):
+            #wiki heading
+            if i == 0:
+                data['full'] += data['heading']
+            #rest of the article
+            data['full'] += '\n\n' + self.strip_text(line.text)
+            i += 1
 
         article = Article(data)
         return article
@@ -86,9 +96,16 @@ class WikiApi:
         r = requests.get(url)
         return r.text
 
+    # remove unwanted information
     def strip_text(self, string):
-        string = re.sub(r'\[\d\]', '', string)
+        #remove cite no.s
+        string = re.sub(r'\[\d+\]', '', string)
+        #remove wiki text bold markup
         string = re.sub(r'"', '', string)
+        #remove sub heading edits tags
+        string = re.sub(r'\[edit\]\s', '\n', string)
+        #remove unwanted areas
+        string = re.sub("|".join(unwanted_sections),'', string, re.IGNORECASE)
         return string
 
 class Article:
