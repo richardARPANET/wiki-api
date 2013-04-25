@@ -31,14 +31,14 @@ def get_package_data(package):
 
 setup(
     name='wikiapi',
-    version='1',
+    version='1.0.1',
     packages=get_packages('wikiapi'),
     package_data=get_package_data('wikiapi'),
     description='A basic python library enabling access to Wikipedia.org\'s search results and article content.',
     author='Richard O\'Dwyer',
     author_email='richard@richard.do',
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
-    long_description=open('README.md').read(),
+    long_description='https://github.com/richardasaurus/wiki-api',
     install_requires=['requests', 'pyquery'],
     classifiers=[
         'Intended Audience :: Developers',

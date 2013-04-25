@@ -4,6 +4,10 @@ A basic python library enabling access to Wikipedia.org's search results and art
 
 ## How To Use
 
+### Install WikiApi
+
+    sudo pip install wikiapi
+
 ### Create an instance of wiki-api
 
     wiki = WikiApi()
