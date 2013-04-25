@@ -26,12 +26,12 @@ A basic python library enabling access to Wikipedia.org's search results and art
 
 ## Requirements
 
-    1. Python3.3
-    2. Python requests - python-requests.org
-    3. BeautifulSoup4
+    1. Python 2.7
+    2. Python requests "requests"
+    3. PyQuery "pyquery"
 
 ## Tests
 
-    Test .py file can be found in /test.
+    Tests can be found in /tests.
 
 
