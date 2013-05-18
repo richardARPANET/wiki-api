@@ -1,6 +1,6 @@
 # wiki-api
 [![Build Status](https://travis-ci.org/richardasaurus/wiki-api.png?branch=master)](https://travis-ci.org/richardasaurus/wiki-api)
-
+[![Downloads](https://pypip.in/d/wikiapi.py/badge.png)](https://crate.io/packages/wikiapi.py/)
 
 A basic python library enabling access to Wikipedia.org's search results and articles.
 
