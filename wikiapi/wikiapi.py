@@ -40,7 +40,7 @@ class WikiApi:
         resp = self.get(url)
 
         #parse search results
-        xmldoc = minidom.parseString(resp.encode('utf-8'))
+        xmldoc = minidom.parseString(resp)
         items = xmldoc.getElementsByTagName('Item')
 
         #return results as wiki page titles
@@ -98,7 +98,7 @@ class WikiApi:
 
     def get(self, url):
         r = requests.get(url)
-        return r.text
+        return r.content
 
     # remove unwanted information
     def strip_text(self, string):
