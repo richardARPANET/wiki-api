@@ -1,3 +1,2 @@
 requests>=0.10
-wikiapi
 pyquery
