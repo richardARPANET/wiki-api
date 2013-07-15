@@ -40,7 +40,7 @@ class WikiApi:
         resp = self.get(url)
 
         #parse search results
-        xmldoc = minidom.parseString(resp.encode('utf-8'))
+        xmldoc = minidom.parseString(resp)
         items = xmldoc.getElementsByTagName('Item')
 
         #return results as wiki page titles
@@ -61,7 +61,7 @@ class WikiApi:
         paras = html('.mw-content-ltr').find('p')
         data['image'] = 'http:{0}'.format(html('body').find('.image img').attr('src'))
         data['summary'] = str()
-        data['full'] = str()
+        data['full'] = unicode()
         references = html('body').find('.web')
 
         # gather references
@@ -84,7 +84,7 @@ class WikiApi:
 
             clean_text = self.strip_text(line.text())
             if clean_text:
-                data['full'] += '{0}{1}'.format('\n\n', clean_text)
+                data['full'] += '\n\n' + clean_text
 
         data['full'] = data['full'].strip()
         article = Article(data)
@@ -98,7 +98,7 @@ class WikiApi:
 
     def get(self, url):
         r = requests.get(url)
-        return r.text
+        return r.content
 
     # remove unwanted information
     def strip_text(self, string):
@@ -113,7 +113,7 @@ class WikiApi:
         string = re.sub(r'\s*\[\s*edit\s*\]\s*', '\n', string)
         #remove unwanted areas
         string = re.sub("|".join(unwanted_sections), '', string, re.IGNORECASE)
-        return string.encode('utf-8')
+        return string
 
 
 class Article:
