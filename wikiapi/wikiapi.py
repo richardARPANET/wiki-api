@@ -52,14 +52,16 @@ class WikiApi:
         return results
 
     def get_article(self, title):
-        url = '{0}://{1}.{2}{3}'.format(uri_scheme, self.options['locale'], article_uri, title)
+        url = '{0}://{1}.{2}{3}'.format(
+            uri_scheme, self.options['locale'], article_uri, title)
         html = PyQuery(self.get(url))
         data = dict()
 
         # parse wiki data
         data['heading'] = html('#firstHeading').text()
         paras = html('.mw-content-ltr').find('p')
-        data['image'] = 'http:{0}'.format(html('body').find('.image img').attr('src'))
+        data['image'] = 'http:{0}'.format(
+            html('body').find('.image img').attr('src'))
         data['summary'] = str()
         data['full'] = unicode()
         references = html('body').find('.web')
@@ -90,11 +92,25 @@ class WikiApi:
         article = Article(data)
         return article
 
+    def get_relevant_article(self, results, keywords):
+        """
+        Get the most relevant article from the results of find(),
+        using a list of keywords and checking for them in article.summary
+        """
+        for result in results:
+            article = self.get_article(result)
+            has_words = any(word in article.summary for word in keywords)
+            if has_words:
+                return article
+        return None
+
     def build_url(self, params):
         default_params = {'format': 'xml'}
-        query_params = dict(list(default_params.items()) + list(params.items()))
+        query_params = dict(
+            list(default_params.items()) + list(params.items()))
         query_params = urllib.urlencode(query_params)
-        return '{0}://{1}.{2}?{3}'.format(uri_scheme, self.options['locale'], api_uri, query_params)
+        return '{0}://{1}.{2}?{3}'.format(
+            uri_scheme, self.options['locale'], api_uri, query_params)
 
     def get(self, url):
         r = requests.get(url)
@@ -125,3 +141,6 @@ class Article:
         self.summary = data.get('summary')
         self.content = data.get('full')
         self.references = data.get('references')
+
+    def __repr__(self):
+        return '<wikiapi.Article {0}>'.format(self.heading)
