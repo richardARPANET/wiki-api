@@ -99,7 +99,8 @@ class WikiApi:
         """
         for result in results:
             article = self.get_article(result)
-            has_words = any(word in article.summary for word in keywords)
+            summary_words = article.summary.split(' ')
+            has_words = any(word in summary_words for word in keywords)
             if has_words:
                 return article
         return None

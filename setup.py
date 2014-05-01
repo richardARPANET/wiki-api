@@ -31,7 +31,7 @@ def get_package_data(package):
 
 setup(
     name='wikiapi',
-    version='1.1.0',
+    version='1.1.1',
     packages=get_packages('wikiapi'),
     package_data=get_package_data('wikiapi'),
     description='A basic python library enabling access to Wikipedia.org\'s search results and article content.',
