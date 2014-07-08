@@ -65,6 +65,7 @@ class WikiApi:
         data['summary'] = str()
         data['full'] = unicode()
         references = html('body').find('.web')
+        data['url'] = url
 
         # gather references
         data['references'] = []
@@ -142,6 +143,7 @@ class Article:
         self.summary = data.get('summary')
         self.content = data.get('full')
         self.references = data.get('references')
+        self.url = data.get('url')
 
     def __repr__(self):
         return '<wikiapi.Article {0}>'.format(self.heading)
