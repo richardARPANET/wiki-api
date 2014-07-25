@@ -38,7 +38,7 @@ class TestUnicode(unittest.TestCase):
     def setUp(self):
         # using an Italian-Emilian locale that is full of unicode symbols
         self.wiki = WikiApi({'locale': 'eml'})
-        self.res = self.wiki.find('Bulagna')[0]
+        self.res = self.wiki.find('Bulaggna')[0]
         self.article = None
 
     def test_search(self):
