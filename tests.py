@@ -23,7 +23,7 @@ class TestWiki(unittest.TestCase):
     def test_references(self):
         self.assertTrue(isinstance(article.references, list))
 
-    def text_url(self):
+    def test_url(self):
         self.assertTrue(article.url, u"http://en.wikipedia.org/wiki/Bill_Clinton")
 
     def test_get_relevant_article(self):
