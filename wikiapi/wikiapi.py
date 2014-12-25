@@ -1,8 +1,17 @@
-from xml.dom import minidom
-from pyquery import PyQuery
-import requests
-import urllib
+from __future__ import absolute_import
+
+import hashlib
+import logging
+import os
 import re
+import urllib
+from xml.dom import minidom
+
+import requests
+
+from pyquery import PyQuery
+
+logger = logging.getLogger(__name__)
 
 uri_scheme = 'http'
 api_uri = 'wikipedia.org/w/api.php'
@@ -22,7 +31,7 @@ unwanted_sections = [
 ]
 
 
-class WikiApi:
+class WikiApi(object):
 
     def __init__(self, options=None):
         if options is None:
@@ -31,11 +40,15 @@ class WikiApi:
         self.options = options
         if 'locale' not in options:
             self.options['locale'] = 'en'
+        self.caching_enabled = True if options.get('cache') is True else False
+        self.cache_dir = options.get('cache_dir') or '/tmp/wikiapicache'
 
     def find(self, terms):
-        search_params = {'action': 'opensearch',
-                         'search': terms,
-                         'format': 'xml'}
+        search_params = {
+            'action': 'opensearch',
+            'search': terms,
+            'format': 'xml'
+        }
         url = self.build_url(search_params)
         resp = self.get(url)
 
@@ -114,9 +127,50 @@ class WikiApi:
         return '{0}://{1}.{2}?{3}'.format(
             uri_scheme, self.options['locale'], api_uri, query_params)
 
+    def _get_cache_item_path(self, url):
+        """
+        Generates a cache location for a given api call.
+        Returns a file path
+        """
+        cache_dir = self.cache_dir
+        m = hashlib.md5()
+        m.update(url.encode('utf-8'))
+        cache_key = m.hexdigest()
+
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
+        return os.path.join(cache_dir, cache_key + '.cache')
+
+    def _get_cached_response(self, file_path):
+        """ Retrieves response from cache """
+        if os.path.exists(file_path):
+            logger.info('retrieving from WikiApi cache: %s', file_path)
+
+            with open(file_path, 'r+') as resp_data:
+                # import pytest; pytest.set_trace()
+                cached_resp = resp_data.read()
+
+            return cached_resp
+
+    @staticmethod
+    def _cache_response(file_path, resp):
+        with open(file_path, 'w+') as f:
+            f.write(resp)
+
     def get(self, url):
+        if self.caching_enabled:
+            cached_item_path = self._get_cache_item_path(url)
+            cached_resp = self._get_cached_response(cached_item_path)
+            if cached_resp:
+                return cached_resp
+
         r = requests.get(url)
-        return r.content
+        response = r.content
+
+        if self.caching_enabled:
+            self._cache_response(cached_item_path, response)
+
+        return response
 
     # remove unwanted information
     def strip_text(self, string):

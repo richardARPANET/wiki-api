@@ -1,40 +1,77 @@
 # -*- coding: utf-8 -*-
+import os
+import shutil
 from wikiapi import WikiApi
 import unittest
 
-wiki = WikiApi({})
-results = wiki.find('Bill Clinton')
-article = wiki.get_article(results[0])  # taking first search result
-
 
 class TestWiki(unittest.TestCase):
+    def setUp(self):
+        self.wiki = WikiApi()
+        self.results = self.wiki.find('Bill Clinton')
+        self.article = self.wiki.get_article(self.results[0])
+
     def test_heading(self):
-        self.assertIsNotNone(article.heading)
+        self.assertIsNotNone(self.article.heading)
 
     def test_image(self):
-        self.assertTrue(isinstance(article.image, str))
+        self.assertTrue(isinstance(self.article.image, str))
 
     def test_summary(self):
-        self.assertGreater(len(article.summary), 100)
+        self.assertGreater(len(self.article.summary), 100)
 
     def test_content(self):
-        self.assertGreater(len(article.content), 200)
+        self.assertGreater(len(self.article.content), 200)
 
     def test_references(self):
-        self.assertTrue(isinstance(article.references, list))
+        self.assertTrue(isinstance(self.article.references, list))
 
     def test_url(self):
-        self.assertTrue(article.url, u"http://en.wikipedia.org/wiki/Bill_Clinton")
+        self.assertTrue(self.article.url,
+                        "http://en.wikipedia.org/wiki/Bill_Clinton")
 
     def test_get_relevant_article(self):
         keywords = ['president', 'hilary']
-        _article = wiki.get_relevant_article(results, keywords)
+        _article = self.wiki.get_relevant_article(self.results, keywords)
         self.assertTrue('Bill Clinton' in _article.heading)
 
     def test_get_relevant_article_no_result(self):
         keywords = ['hockey player']
-        _article = wiki.get_relevant_article(results, keywords)
+        _article = self.wiki.get_relevant_article(self.results, keywords)
         self.assertIsNone(_article)
+
+
+class TestCache(unittest.TestCase):
+
+    def tearDown(self):
+        shutil.rmtree(self.wiki.cache_dir, ignore_errors=True)
+
+    def _get_cache_size(self):
+        """ Returns a count of the items in the cache """
+        cache = os.path.exists(self.wiki.cache_dir)
+        if not cache:
+            return 0
+        _, _, cache_files = next(os.walk(self.wiki.cache_dir))
+        return len(cache_files)
+
+    def test_cache_populated(self):
+        """ Tests the cache is populated correctly """
+        self.wiki = WikiApi({'cache': True, 'cache_dir': '/tmp/wikiapi-test'})
+
+        self.assertEqual(self._get_cache_size(), 0)
+        # Make multiple calls to ensure no duplicate cache items created
+        self.wiki.find('Bob Marley')
+        self.wiki.find('Bob Marley')
+
+        self.assertEqual(self._get_cache_size(), 1)
+
+    def test_cache_not_populated_when_disabled(self):
+        """ Tests the cache is not populated when disabled (default) """
+        self.wiki = WikiApi({'cache': False})
+
+        self.assertEqual(self._get_cache_size(), 0)
+        self.wiki.find('Bob Marley')
+        self.assertEqual(self._get_cache_size(), 0)
 
 
 class TestUnicode(unittest.TestCase):

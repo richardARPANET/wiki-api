@@ -40,6 +40,9 @@ article.url => 'http://en.wikipedia.org/wiki/Barack_Obama'
 
 ## Tests
 
-    Tests can be found in /tests.
+```
+pip install nosetests
+nosetests
+```
 
 
