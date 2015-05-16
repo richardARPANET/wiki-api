@@ -1,24 +1,21 @@
-from __future__ import absolute_import
-
 import hashlib
 import logging
 import os
 import re
-import urllib
 from xml.dom import minidom
 
 import requests
-
 from pyquery import PyQuery
 
 logger = logging.getLogger(__name__)
 
-uri_scheme = 'http'
+uri_scheme = 'https'
 api_uri = 'wikipedia.org/w/api.php'
 article_uri = 'wikipedia.org/wiki/'
 
-#common sub sections to exclude from output
-unwanted_sections = [
+# common sub sections to exclude from output
+unwanted_sections = (
+    'External links and resources',
     'External links',
     'Navigation menu',
     'See also',
@@ -28,7 +25,7 @@ unwanted_sections = [
     'Official',
     'Other',
     'Notes',
-]
+)
 
 
 class WikiApi(object):
@@ -49,14 +46,19 @@ class WikiApi(object):
             'search': terms,
             'format': 'xml'
         }
-        url = self.build_url(search_params)
-        resp = self.get(url)
 
-        #parse search results
+        url = "{scheme}://{locale_sub}.{hostname_path}".format(
+            scheme=uri_scheme,
+            locale_sub=self.options['locale'],
+            hostname_path=api_uri
+        )
+        resp = self.get(url, search_params)
+
+        # parse search results
         xmldoc = minidom.parseString(resp)
         items = xmldoc.getElementsByTagName('Item')
 
-        #return results as wiki page titles
+        # return results as wiki page titles
         results = []
         for item in items:
             link = item.getElementsByTagName('Url')[0].firstChild.data
@@ -65,19 +67,23 @@ class WikiApi(object):
         return results
 
     def get_article(self, title):
-        url = '{0}://{1}.{2}{3}'.format(
-            uri_scheme, self.options['locale'], article_uri, title)
+        url = '{scheme}://{locale_sub}.{hostname_path}{article_title}'.format(
+            scheme=uri_scheme,
+            locale_sub=self.options['locale'],
+            hostname_path=article_uri,
+            article_title=title
+        )
         html = PyQuery(self.get(url))
-        data = dict()
+        data = {}
 
         # parse wiki data
         data['heading'] = html('#firstHeading').text()
         paras = html('.mw-content-ltr').find('p')
         data['image'] = 'http:{0}'.format(
             html('body').find('.image img').attr('src'))
-        data['summary'] = str()
-        data['full'] = unicode()
-        references = html('body').find('.web')
+        data['summary'] = ""
+        data['full'] = ""
+        references = html('body').find('.references')
         data['url'] = url
 
         # gather references
@@ -102,7 +108,7 @@ class WikiApi(object):
             if clean_text:
                 data['full'] += '\n\n' + clean_text
 
-        data['full'] = data['full'].strip()
+        data['full'] = self._remove_ads_from_content(data['full']).strip()
         article = Article(data)
         return article
 
@@ -118,14 +124,6 @@ class WikiApi(object):
             if has_words:
                 return article
         return None
-
-    def build_url(self, params):
-        default_params = {'format': 'xml'}
-        query_params = dict(
-            list(default_params.items()) + list(params.items()))
-        query_params = urllib.urlencode(query_params)
-        return '{0}://{1}.{2}?{3}'.format(
-            uri_scheme, self.options['locale'], api_uri, query_params)
 
     def _get_cache_item_path(self, url):
         """
@@ -146,7 +144,7 @@ class WikiApi(object):
         if os.path.exists(file_path):
             logger.info('retrieving from WikiApi cache: %s', file_path)
 
-            with open(file_path, 'r+') as resp_data:
+            with open(file_path, 'rb') as resp_data:
                 # import pytest; pytest.set_trace()
                 cached_resp = resp_data.read()
 
@@ -154,44 +152,51 @@ class WikiApi(object):
 
     @staticmethod
     def _cache_response(file_path, resp):
-        with open(file_path, 'w+') as f:
+        with open(file_path, 'wb') as f:
             f.write(resp)
 
-    def get(self, url):
+    def get(self, url, params={}):
         if self.caching_enabled:
             cached_item_path = self._get_cache_item_path(url)
             cached_resp = self._get_cached_response(cached_item_path)
             if cached_resp:
                 return cached_resp
 
-        r = requests.get(url)
-        response = r.content
+        resp = requests.get(url, params=params)
+        resp_content = resp.content
 
         if self.caching_enabled:
-            self._cache_response(cached_item_path, response)
+            self._cache_response(cached_item_path, resp_content)
 
-        return response
+        return resp_content
 
     # remove unwanted information
     def strip_text(self, string):
-        #remove citation numbers
+        # remove citation numbers
         string = re.sub(r'\[\s\d+\s\]', '', string)
-        #remove wiki text bold markup tags
+        # remove wiki text bold markup tags
         string = re.sub(r'"', '', string)
-        #correct spacing around fullstops + commas
+        # correct spacing around fullstops + commas
         string = re.sub(r' +[.] +', '. ', string)
         string = re.sub(r' +[,] +', ', ', string)
-        #remove sub heading edits tags
+        # remove sub heading edits tags
         string = re.sub(r'\s*\[\s*edit\s*\]\s*', '\n', string)
-        #remove unwanted areas
-        string = re.sub("|".join(unwanted_sections), '', string, re.IGNORECASE)
+        # remove unwanted areas
+        string = re.sub(
+            '|'.join(unwanted_sections), '', string, re.I | re.M | re.S
+        )
         return string
+
+    @staticmethod
+    def _remove_ads_from_content(bio_text):
+        """Returns article content without references to Wikipedia"""
+        pattern = r'([^.]*?Wikipedia[^.]*\.)'
+        return re.sub(pattern, '', bio_text)
 
 
 class Article:
     def __init__(self, data=None):
-        if data is None:
-            data = {}
+        data = data or {}
         self.heading = data.get('heading')
         self.image = data.get('image')
         self.summary = data.get('summary')

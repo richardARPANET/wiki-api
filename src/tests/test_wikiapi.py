@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import shutil
+from six.moves import urllib_parse
 from wikiapi import WikiApi
 import unittest
+
+
+def assert_url_valid(url):
+    if not bool(urllib_parse.urlparse(url).netloc):
+        raise AssertionError('{} is not a valid URL'.format(url))
 
 
 class TestWiki(unittest.TestCase):
@@ -12,33 +18,60 @@ class TestWiki(unittest.TestCase):
         self.article = self.wiki.get_article(self.results[0])
 
     def test_heading(self):
-        self.assertIsNotNone(self.article.heading)
+        assert self.article.heading == 'Bill Clinton'
 
     def test_image(self):
-        self.assertTrue(isinstance(self.article.image, str))
+        assert_url_valid(url=self.article.image)
 
     def test_summary(self):
-        self.assertGreater(len(self.article.summary), 100)
+        assert len(self.article.summary) > 100
 
     def test_content(self):
-        self.assertGreater(len(self.article.content), 200)
+        assert len(self.article.content) > 200
 
     def test_references(self):
-        self.assertTrue(isinstance(self.article.references, list))
+        assert isinstance(self.article.references, list) is True
 
     def test_url(self):
-        self.assertTrue(self.article.url,
-                        "http://en.wikipedia.org/wiki/Bill_Clinton")
+        assert_url_valid(url=self.article.url)
+        assert self.article.url == 'https://en.wikipedia.org/wiki/Bill_Clinton'
 
     def test_get_relevant_article(self):
         keywords = ['president', 'hilary']
         _article = self.wiki.get_relevant_article(self.results, keywords)
-        self.assertTrue('Bill Clinton' in _article.heading)
+
+        assert 'Bill Clinton' in _article.heading
+        assert len(_article.content) > 5000
+        assert 'President Bill Clinton' in _article.content
 
     def test_get_relevant_article_no_result(self):
         keywords = ['hockey player']
         _article = self.wiki.get_relevant_article(self.results, keywords)
-        self.assertIsNone(_article)
+        assert _article is None
+
+    def test__remove_ads_from_content(self):
+        content = (
+            'From Wikipedia, the free encyclopedia. \n\nLee Strasberg '
+            '(November 17, 1901 2013 February 17, 1982) was an American '
+            'actor, director and acting teacher.\n'
+            'Today, Ellen Burstyn, Al Pacino, and Harvey Keitel lead this '
+            'nonprofit studio dedicated to the development of actors, '
+            'playwrights, and directors.\n\nDescription above from the '
+            'Wikipedia article\xa0Lee Strasberg,\xa0licensed under CC-BY-SA, '
+            'full list of contributors on Wikipedia.'
+        )
+
+        result_content = self.wiki._remove_ads_from_content(content)
+
+        expected_content = (
+            ' \n\nLee Strasberg '
+            '(November 17, 1901 2013 February 17, 1982) was an American '
+            'actor, director and acting teacher.\n'
+            'Today, Ellen Burstyn, Al Pacino, and Harvey Keitel lead this '
+            'nonprofit studio dedicated to the development of actors, '
+            'playwrights, and directors.'
+        )
+        assert expected_content == result_content
 
 
 class TestCache(unittest.TestCase):
@@ -69,9 +102,9 @@ class TestCache(unittest.TestCase):
         """ Tests the cache is not populated when disabled (default) """
         self.wiki = WikiApi({'cache': False})
 
-        self.assertEqual(self._get_cache_size(), 0)
+        assert self._get_cache_size() == 0
         self.wiki.find('Bob Marley')
-        self.assertEqual(self._get_cache_size(), 0)
+        assert self._get_cache_size() == 0
 
 
 class TestUnicode(unittest.TestCase):
@@ -83,12 +116,8 @@ class TestUnicode(unittest.TestCase):
 
     def test_search(self):
         # this is urlencoded.
-        self.assertEqual(self.res, u'Bul%C3%A5ggna')
+        assert self.res == u'Bul%C3%A5ggna'
 
     def test_article(self):
-        #unicode errors will likely blow in your face here
-        self.assertIsNotNone(self.wiki.get_article(self.res))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        # unicode errors will likely blow in your face here
+        assert self.wiki.get_article(self.res) is not None
