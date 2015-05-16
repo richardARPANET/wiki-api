@@ -6,9 +6,9 @@ A basic python library enabling access to Wikipedia.org's search results and art
 
 ## How To Use
 
-### Install WikiApi
+### Installation
 
-    sudo pip install wikiapi
+    pip install wikiapi
 
 ### Create an instance of wiki-api
 ```python
@@ -34,15 +34,14 @@ article.url => 'http://en.wikipedia.org/wiki/Barack_Obama'
 
 ## Requirements
 
-    1. Python 2.7
-    2. Python requests "requests"
-    3. PyQuery "pyquery"
+    1. Python 2 or 3
+    2. See requirements.txt
 
-## Tests
+## Running the tests
 
 ```
-pip install nosetests
-nosetests
+pip install tox
+tox
 ```
 
 
