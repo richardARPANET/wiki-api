@@ -6,7 +6,9 @@ Release History
 1.2.2 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+**Bugfixes**
+
+- Fixes missing dependency in install_requires
 
 
 1.2.1 (2015-06-08)
