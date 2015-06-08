@@ -32,7 +32,20 @@ class TestWiki(object):
         assert_url_valid(url=set_up['article'].image)
 
     def test_summary(self, set_up):
-        assert len(set_up['article'].summary) > 100
+        results = set_up['wiki'].find('Tom Hanks')
+        article = set_up['wiki'].get_article(results[0])
+
+        expected_summary_start = (
+            'Thomas Jeffrey "Tom" Hanks (born July 9, 1956) is an '
+            'American actor and filmmaker.'
+        )
+        expected_summary_end = (
+            'In 2004, he received the Stanley Kubrick Britannia Award for '
+            'Excellence in Film from the British Academy of Film and '
+            'Television Arts (BAFTA).'
+        )
+        assert article.summary.startswith(expected_summary_start) is True
+        assert article.summary.endswith(expected_summary_end) is True
 
     def test_content(self, set_up):
         assert len(set_up['article'].content) > 200

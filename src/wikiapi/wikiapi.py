@@ -5,6 +5,7 @@ import re
 from xml.dom import minidom
 
 import requests
+from bs4 import BeautifulSoup
 from pyquery import PyQuery
 
 logger = logging.getLogger(__name__)
@@ -94,10 +95,12 @@ class WikiApi(object):
         # gather summary
         summary_max = 900
         chars = 0
-        for p in paras.items():
+        for pgraph in paras.items():
             if chars < summary_max:
-                chars += len(p.text())
-                data['summary'] += '\n\n' + self.strip_text(p.text())
+                chars += len(pgraph.text())
+                text_no_tags = self._remove_tags(pgraph.outer_html())
+                stripped_summary = self.strip_text(text_no_tags)
+                data['summary'] += stripped_summary
 
         # gather full content
         for idx, line in enumerate(html('body').find('h2, p').items()):
@@ -111,6 +114,11 @@ class WikiApi(object):
         data['full'] = self._remove_ads_from_content(data['full']).strip()
         article = Article(data)
         return article
+
+    @staticmethod
+    def _remove_tags(text):  # pragma: no cover
+        """Returns text without html tags"""
+        return BeautifulSoup(text).text
 
     def get_relevant_article(self, results, keywords):
         """
@@ -173,9 +181,7 @@ class WikiApi(object):
     # remove unwanted information
     def strip_text(self, string):
         # remove citation numbers
-        string = re.sub(r'\[\s\d+\s\]', '', string)
-        # remove wiki text bold markup tags
-        string = re.sub(r'"', '', string)
+        string = re.sub(r'\[\d+]', '', string)
         # correct spacing around fullstops + commas
         string = re.sub(r' +[.] +', '. ', string)
         string = re.sub(r' +[,] +', ', ', string)
