@@ -6,7 +6,9 @@ Release History
 1.2.1 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+**Bugfixes**
+
+- Fixes missing "double quotes" in Article.summary
 
 
 1.2.0 (2015-05-16)
