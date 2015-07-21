@@ -54,6 +54,7 @@ class WikiApi(object):
             hostname_path=api_uri
         )
         resp = self.get(url, search_params)
+        logger.debug('find "%s" response: %s', terms, resp)
 
         # parse search results
         xmldoc = minidom.parseString(resp)
