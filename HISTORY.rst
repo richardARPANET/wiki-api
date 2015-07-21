@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-1.2.3 (unreleased)
+1.2.3 (2015-07-21)
 ++++++++++++++++++
 
 - Nothing changed yet.
