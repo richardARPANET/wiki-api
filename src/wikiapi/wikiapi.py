@@ -15,7 +15,7 @@ api_uri = 'wikipedia.org/w/api.php'
 article_uri = 'wikipedia.org/wiki/'
 
 # common sub sections to exclude from output
-unwanted_sections = (
+UNWANTED_SECTIONS = (
     'External links and resources',
     'External links',
     'Navigation menu',
@@ -91,7 +91,7 @@ class WikiApi(object):
         # gather references
         data['references'] = []
         for ref in references.items():
-            data['references'].append(self.strip_text(ref.text()))
+            data['references'].append(self._strip_text(ref.text()))
 
         # gather summary
         summary_max = 900
@@ -99,8 +99,8 @@ class WikiApi(object):
         for pgraph in paras.items():
             if chars < summary_max:
                 chars += len(pgraph.text())
-                text_no_tags = self._remove_tags(pgraph.outer_html())
-                stripped_summary = self.strip_text(text_no_tags)
+                text_no_tags = self._strip_html(pgraph.outer_html())
+                stripped_summary = self._strip_text(text_no_tags)
                 data['summary'] += stripped_summary
 
         # gather full content
@@ -108,7 +108,7 @@ class WikiApi(object):
             if idx == 0:
                 data['full'] += data['heading']
 
-            clean_text = self.strip_text(line.text())
+            clean_text = self._strip_text(line.text())
             if clean_text:
                 data['full'] += '\n\n' + clean_text
 
@@ -117,8 +117,7 @@ class WikiApi(object):
         return article
 
     @staticmethod
-    def _remove_tags(text):  # pragma: no cover
-        """Returns text without html tags"""
+    def _strip_html(text):  # pragma: no cover
         return BeautifulSoup(text).text
 
     def get_relevant_article(self, results, keywords):
@@ -134,14 +133,14 @@ class WikiApi(object):
                 return article
         return None
 
-    def _get_cache_item_path(self, url):
+    def _get_cache_item_path(self, url, params):
         """
         Generates a cache location for a given api call.
         Returns a file path
         """
         cache_dir = self.cache_dir
         m = hashlib.md5()
-        m.update(url.encode('utf-8'))
+        m.update(url.encode('utf-8') + unicode(params))
         cache_key = m.hexdigest()
 
         if not os.path.exists(cache_dir):
@@ -166,7 +165,10 @@ class WikiApi(object):
 
     def get(self, url, params={}):
         if self.caching_enabled:
-            cached_item_path = self._get_cache_item_path(url)
+            cached_item_path = self._get_cache_item_path(
+                url=url,
+                params=params
+            )
             cached_resp = self._get_cached_response(cached_item_path)
             if cached_resp:
                 return cached_resp
@@ -179,8 +181,8 @@ class WikiApi(object):
 
         return resp_content
 
-    # remove unwanted information
-    def strip_text(self, string):
+    def _strip_text(self, string):
+        """Removed unwanted information from article test"""
         # remove citation numbers
         string = re.sub(r'\[\d+]', '', string)
         # correct spacing around fullstops + commas
@@ -190,7 +192,7 @@ class WikiApi(object):
         string = re.sub(r'\s*\[\s*edit\s*\]\s*', '\n', string)
         # remove unwanted areas
         string = re.sub(
-            '|'.join(unwanted_sections), '', string, re.I | re.M | re.S
+            '|'.join(UNWANTED_SECTIONS), '', string, re.I | re.M | re.S
         )
         return string
 
@@ -201,7 +203,7 @@ class WikiApi(object):
         return re.sub(pattern, '', bio_text)
 
 
-class Article:
+class Article(object):
     def __init__(self, data=None):
         data = data or {}
         self.heading = data.get('heading')

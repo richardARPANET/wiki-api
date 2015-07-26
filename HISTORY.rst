@@ -6,13 +6,13 @@ Release History
 1.2.4 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Fixes bug with cache keys not being unique, leading to incorrect response coming from cache (see ISSUE #9)
 
 
 1.2.3 (2015-07-21)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Adds logging of find() response from Wikipedia
 
 
 1.2.2 (2015-06-08)
