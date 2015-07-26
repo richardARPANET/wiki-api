@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-1.2.4 (unreleased)
+1.2.4 (2015-07-26)
 ++++++++++++++++++
 
 - Fixes bug with cache keys not being unique, leading to incorrect response coming from cache (see ISSUE #9)
