@@ -116,10 +116,13 @@ class TestCache(object):
 
         assert self._get_cache_size(wiki) == 0
         # Make multiple calls to ensure no duplicate cache items created
-        wiki.find('Bob Marley')
-        wiki.find('Bob Marley')
-
+        assert wiki.find('Bob Marley') == wiki.find('Bob Marley')
         assert self._get_cache_size(wiki) == 1
+
+        # Check cache keys are unique
+        assert wiki.find('Tom Hanks') != wiki.find('Bob Marley')
+
+        assert self._get_cache_size(wiki) == 2
         shutil.rmtree(wiki.cache_dir, ignore_errors=True)
 
     def test_cache_not_populated_when_disabled(self):
