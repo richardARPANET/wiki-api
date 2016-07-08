@@ -6,7 +6,7 @@ Release History
 1.2.5 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Fixes bug in caching with Python 3
 
 
 1.2.4 (2015-07-26)
