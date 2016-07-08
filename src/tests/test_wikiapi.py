@@ -3,6 +3,7 @@ import os
 import shutil
 
 import pytest
+import six
 from six.moves import urllib_parse
 from wikiapi import WikiApi
 
