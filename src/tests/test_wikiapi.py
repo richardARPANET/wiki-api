@@ -3,6 +3,7 @@ import os
 import shutil
 
 import pytest
+import six
 from six.moves import urllib_parse
 from wikiapi import WikiApi
 
@@ -36,16 +37,9 @@ class TestWiki(object):
         article = set_up['wiki'].get_article(results[0])
 
         expected_summary_start = (
-            'Thomas Jeffrey "Tom" Hanks (born July 9, 1956) is an '
-            'American actor and filmmaker.'
-        )
-        expected_summary_end = (
-            'In 2004, he received the Stanley Kubrick Britannia Award for '
-            'Excellence in Film from the British Academy of Film and '
-            'Television Arts (BAFTA).'
+            'Thomas Jeffrey "Tom" Hanks '
         )
         assert article.summary.startswith(expected_summary_start) is True
-        assert article.summary.endswith(expected_summary_end) is True
 
     def test_content(self, set_up):
         assert len(set_up['article'].content) > 200
@@ -103,7 +97,7 @@ class TestWiki(object):
 class TestCache(object):
 
     def _get_cache_size(self, wiki_instance):
-        """ Returns a count of the items in the cache """
+        """Return a count of the items in the cache"""
         cache = os.path.exists(wiki_instance.cache_dir)
         if not cache:
             return 0
@@ -111,7 +105,6 @@ class TestCache(object):
         return len(cache_files)
 
     def test_cache_populated(self):
-        """ Tests the cache is populated correctly """
         wiki = WikiApi({'cache': True, 'cache_dir': '/tmp/wikiapi-test'})
 
         assert self._get_cache_size(wiki) == 0
@@ -126,7 +119,6 @@ class TestCache(object):
         shutil.rmtree(wiki.cache_dir, ignore_errors=True)
 
     def test_cache_not_populated_when_disabled(self):
-        """ Tests the cache is not populated when disabled (default) """
         wiki = WikiApi({'cache': False})
 
         assert self._get_cache_size(wiki) == 0

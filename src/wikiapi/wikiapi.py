@@ -4,6 +4,7 @@ import os
 import re
 from xml.dom import minidom
 
+import six
 import requests
 from bs4 import BeautifulSoup
 from pyquery import PyQuery
@@ -140,7 +141,8 @@ class WikiApi(object):
         """
         cache_dir = self.cache_dir
         m = hashlib.md5()
-        m.update(url.encode('utf-8') + unicode(params))
+        hash_str = '{0}{1}'.format(six.text_type(url), six.text_type(params))
+        m.update(hash_str.encode('utf-8'))
         cache_key = m.hexdigest()
 
         if not os.path.exists(cache_dir):
