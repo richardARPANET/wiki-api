@@ -119,7 +119,7 @@ class WikiApi(object):
 
     @staticmethod
     def _strip_html(text):  # pragma: no cover
-        return BeautifulSoup(text).text
+        return BeautifulSoup(text, 'lxml').text
 
     def get_relevant_article(self, results, keywords):
         """
