@@ -36,10 +36,9 @@ class TestWiki(object):
         results = set_up['wiki'].find('Tom Hanks')
         article = set_up['wiki'].get_article(results[0])
 
-        expected_summary_start = (
-            'Thomas Jeffrey "Tom" Hanks '
-        )
-        assert article.summary.startswith(expected_summary_start) is True
+        assert 'Thomas' in article.summary
+        assert 'Jeffrey' in article.summary
+        assert 'Hanks' in article.summary
 
     def test_content(self, set_up):
         assert len(set_up['article'].content) > 200
