@@ -1,3 +1,6 @@
+**NOTICE**: If you're reading this on GitHub.com please be aware this is a mirror of the primary remote located at https://code.richard.do/explore/projects.
+Please direct issues and pull requests there.
+
 # wiki-api
 [![Build Status](https://travis-ci.org/richardasaurus/wiki-api.png?branch=master)](https://travis-ci.org/richardasaurus/wiki-api)
 
