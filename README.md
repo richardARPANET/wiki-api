@@ -1,6 +1,3 @@
-**NOTICE**: If you're reading this on GitHub.com please be aware this is a mirror of the primary remote located at https://code.richard.do/explore/projects.
-Please direct issues and pull requests there.
-
 # wiki-api
 [![Build Status](https://travis-ci.org/richardasaurus/wiki-api.png?branch=master)](https://travis-ci.org/richardasaurus/wiki-api)
 
@@ -36,7 +33,7 @@ article.url => 'http://en.wikipedia.org/wiki/Barack_Obama'
 
 ## Requirements
 
-    1. Python 2 or 3
+    1. Python 3
     2. See requirements.txt
 
 ## Running the tests

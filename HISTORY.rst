@@ -3,10 +3,11 @@
 Release History
 ---------------
 
-1.2.6 (unreleased)
+2.0.0 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Drops Python 2 support.
+- Adds ``get_tables`` method to get all tables of data from a given Wikipedia page.
 
 
 1.2.5 (2016-07-09)

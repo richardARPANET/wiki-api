@@ -2,11 +2,12 @@ import hashlib
 import logging
 import os
 import re
-from xml.dom import minidom
 
+from xml.dom import minidom
+import pandas as pd
 import six
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from pyquery import PyQuery
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,6 @@ UNWANTED_SECTIONS = (
 
 
 class WikiApi(object):
-
     def __init__(self, options=None):
         if options is None:
             options = {}
@@ -46,13 +46,13 @@ class WikiApi(object):
         search_params = {
             'action': 'opensearch',
             'search': terms,
-            'format': 'xml'
+            'format': 'xml',
         }
 
-        url = "{scheme}://{locale_sub}.{hostname_path}".format(
+        url = '{scheme}://{locale_sub}.{hostname_path}'.format(
             scheme=uri_scheme,
             locale_sub=self.options['locale'],
-            hostname_path=api_uri
+            hostname_path=api_uri,
         )
         resp = self.get(url, search_params)
         logger.debug('find "%s" response: %s', terms, resp)
@@ -74,7 +74,7 @@ class WikiApi(object):
             scheme=uri_scheme,
             locale_sub=self.options['locale'],
             hostname_path=article_uri,
-            article_title=title
+            article_title=title,
         )
         html = PyQuery(self.get(url))
         data = {}
@@ -83,9 +83,10 @@ class WikiApi(object):
         data['heading'] = html('#firstHeading').text()
         paras = html('.mw-content-ltr').find('p')
         data['image'] = 'http:{0}'.format(
-            html('body').find('.image img').attr('src'))
-        data['summary'] = ""
-        data['full'] = ""
+            html('body').find('.image img').attr('src')
+        )
+        data['summary'] = ''
+        data['full'] = ''
         references = html('body').find('.references')
         data['url'] = url
 
@@ -168,8 +169,7 @@ class WikiApi(object):
     def get(self, url, params={}):
         if self.caching_enabled:
             cached_item_path = self._get_cache_item_path(
-                url=url,
-                params=params
+                url=url, params=params
             )
             cached_resp = self._get_cached_response(cached_item_path)
             if cached_resp:
@@ -183,20 +183,66 @@ class WikiApi(object):
 
         return resp_content
 
+    def get_tables(self, url):
+        pd_tables = pd.read_html(url)
+        pd_headings = []
+        for table_df in pd_tables:
+            try:
+                table_df.columns = [
+                    self._strip_text(c).strip() for c in table_df.columns
+                ]
+            except TypeError:
+                continue
+            pd_headings.append(tuple(table_df.columns))
+
+        tables_out = {}
+
+        soup = BeautifulSoup(self.get(url), 'html.parser')
+        tables = soup.find_all('table', class_='sortable')
+        for table in tables:
+            caption = table.find_all('caption')[0]
+            cap_children = tuple(caption.children)
+            caption = caption.text
+            if cap_children:
+                try:
+                    caption = tuple(
+                        c.text for c in cap_children if hasattr(c, 'text')
+                    )[-1]
+                except IndexError:
+                    caption = cap_children[0]
+            caption = self._strip_text(caption).strip()
+            if not caption:
+                continue
+            ths = [
+                t
+                for t in table.find_all('th')
+                if t.attrs.get('scope') == 'col'
+            ]
+            headings = [self._strip_text(x.text).strip() for x in ths]
+            matches = tuple(
+                x for x in pd_tables if x.columns.to_list() == headings
+            )
+            if matches:
+                tables_out[caption] = matches[0]
+        return tables_out
+
     def _strip_text(self, string):
+        import unidecode
+
         """Removed unwanted information from article test"""
         # remove citation numbers
         string = re.sub(r'\[\d+]', '', string)
         # correct spacing around fullstops + commas
         string = re.sub(r' +[.] +', '. ', string)
         string = re.sub(r' +[,] +', ', ', string)
+        string = re.sub(r' +', ' ', string)
         # remove sub heading edits tags
         string = re.sub(r'\s*\[\s*edit\s*\]\s*', '\n', string)
         # remove unwanted areas
         string = re.sub(
             '|'.join(UNWANTED_SECTIONS), '', string, re.I | re.M | re.S
         )
-        return string
+        return unidecode.unidecode(string)
 
     @staticmethod
     def _remove_ads_from_content(bio_text):

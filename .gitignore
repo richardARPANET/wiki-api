@@ -4,7 +4,8 @@
 #################
 ## Eclipse
 #################
-
+.pytest_cache/
+.vscode/
 *.pydevproject
 .project
 .metadata
