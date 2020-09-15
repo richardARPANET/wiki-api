@@ -1,3 +1,9 @@
-setup.py
-src/wikiapi/__init__.py
-src/wikiapi/wikiapi.py
+include HISTORY.rst
+include README.md
+include requirements.txt
+
+recursive-include tests *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+
+recursive-include docs *.md *.rst conf.py Makefile make.bat
