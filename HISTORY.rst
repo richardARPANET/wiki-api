@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-2.0.0 (unreleased)
+2.0.0 (2020-09-15)
 ++++++++++++++++++
 
 - Drops Python 2 support.
