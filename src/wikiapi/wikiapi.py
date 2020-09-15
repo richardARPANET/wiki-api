@@ -6,6 +6,7 @@ import re
 from xml.dom import minidom
 import pandas as pd
 import six
+import unidecode
 import requests
 from bs4 import BeautifulSoup, NavigableString
 from pyquery import PyQuery
@@ -227,8 +228,6 @@ class WikiApi(object):
         return tables_out
 
     def _strip_text(self, string):
-        import unidecode
-
         """Removed unwanted information from article test"""
         # remove citation numbers
         string = re.sub(r'\[\d+]', '', string)
