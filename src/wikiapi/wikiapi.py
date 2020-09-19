@@ -184,7 +184,7 @@ class WikiApi(object):
 
         return resp_content
 
-    def get_tables(self, url):
+    def get_tables(self, url):  # noqa: C901
         pd_tables = pd.read_html(url)
         pd_headings = []
         for table_df in pd_tables:
@@ -204,17 +204,22 @@ class WikiApi(object):
             try:
                 caption = table.find_all('caption')[0]
             except IndexError:
-                logger.info('Could not find caption for table, skipping')
-                continue
-            cap_children = tuple(caption.children)
-            caption = caption.text
-            if cap_children:
-                try:
-                    caption = tuple(
-                        c.text for c in cap_children if hasattr(c, 'text')
-                    )[-1]
-                except IndexError:
-                    caption = cap_children[0]
+                el = tuple(table.previous_siblings)[-1]
+                if 'shortdescription' in el.get_attribute_list(key='class'):
+                    caption = el.text
+                else:
+                    logger.info('Could not find caption for table')
+                    continue
+            else:
+                cap_children = tuple(caption.children)
+                caption = caption.text
+                if cap_children:
+                    try:
+                        caption = tuple(
+                            c.text for c in cap_children if hasattr(c, 'text')
+                        )[-1]
+                    except IndexError:
+                        caption = cap_children[0]
             caption = self._strip_text(caption).strip()
             if not caption:
                 continue
@@ -223,7 +228,25 @@ class WikiApi(object):
                 for t in table.find_all('th')
                 if t.attrs.get('scope') == 'col'
             ]
-            headings = [self._strip_text(x.text).strip() for x in ths]
+            if not ths:
+                try:
+                    th = [
+                        t
+                        for t in table.find_all('th')
+                        if 'data-sort-type' in t.attrs
+                    ][0]
+                except IndexError:
+                    continue
+                ths = (
+                    tuple(th.previous_siblings)
+                    + (th,)
+                    + tuple(th.next_siblings)
+                )
+            headings = [
+                self._strip_text(x.text).strip()
+                for x in ths
+                if hasattr(x, 'text')
+            ]
             matches = tuple(
                 x for x in pd_tables if x.columns.to_list() == headings
             )
