@@ -82,6 +82,13 @@ class TestWiki:
         )
         assert expected_content == result_content
 
+    def test_get_tables2(self, mocker):
+        url = 'https://en.wikipedia.org/wiki/World_population'
+        wiki = self.wiki
+
+        tables = wiki.get_tables(url=url)
+        assert tables
+
     def test_get_tables(self, mocker):
         url = (
             'https://en.wikipedia.org/wiki/'

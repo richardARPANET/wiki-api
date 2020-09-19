@@ -201,7 +201,11 @@ class WikiApi(object):
         soup = BeautifulSoup(self.get(url), 'html.parser')
         tables = soup.find_all('table', class_='sortable')
         for table in tables:
-            caption = table.find_all('caption')[0]
+            try:
+                caption = table.find_all('caption')[0]
+            except IndexError:
+                logger.info('Could not find caption for table, skipping')
+                continue
             cap_children = tuple(caption.children)
             caption = caption.text
             if cap_children:
