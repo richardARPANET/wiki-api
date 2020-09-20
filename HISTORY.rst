@@ -6,7 +6,7 @@ Release History
 2.0.3 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Bugfix, ``get_tables`` method, skip tables with no caption.
 
 
 2.0.2 (2020-09-20)

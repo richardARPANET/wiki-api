@@ -214,12 +214,25 @@ class WikiApi(object):
                 cap_children = tuple(caption.children)
                 caption = caption.text
                 if cap_children:
-                    try:
-                        caption = tuple(
-                            c.text for c in cap_children if hasattr(c, 'text')
-                        )[-1]
-                    except IndexError:
-                        caption = cap_children[0]
+                    children = []
+                    for child in cap_children:
+                        if isinstance(child, NavigableString):
+                            children.append(child)
+                        elif (
+                            child and hasattr(child, 'text')
+                            and not child.text.startswith('[')
+                            and not child.find_all('abbr')
+                        ):
+                            children.append(child.text)
+                    if children:
+                        caption = (
+                            ' '.join(children)
+                            .replace('\n', ' ')
+                            .replace(':', '')
+                        )
+            caption = (
+                re.sub(r'\([^)]*\)', '', caption).replace(':', '').strip()
+            )
             caption = self._strip_text(caption).strip()
             if not caption:
                 continue
@@ -236,12 +249,13 @@ class WikiApi(object):
                         if 'data-sort-type' in t.attrs
                     ][0]
                 except IndexError:
-                    continue
-                ths = (
-                    tuple(th.previous_siblings)
-                    + (th,)
-                    + tuple(th.next_siblings)
-                )
+                    ths = table.find_all('th')
+                else:
+                    ths = (
+                        tuple(th.previous_siblings)
+                        + (th,)
+                        + tuple(th.next_siblings)
+                    )
             headings = [
                 self._strip_text(x.text).strip()
                 for x in ths

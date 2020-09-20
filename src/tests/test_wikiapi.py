@@ -82,19 +82,49 @@ class TestWiki:
         )
         assert expected_content == result_content
 
+    @pytest.mark.parametrize(
+        'url, expected_tables',
+        [
+            (
+                'https://en.wikipedia.org/wiki/World_population',
+                [
+                    'Population by continent',
+                    '10 most densely populated countries',
+                    'Countries ranking highly in both total population and '
+                    'population density',
+                ],
+            ),
+            (
+                'https://en.wikipedia.org/wiki/List_of_countries_and_'
+                'dependencies_by_population',
+                ['Countries and dependent territories by population'],
+            ),
+            (
+                'https://en.wikipedia.org/wiki/Influenza',
+                [],
+            ),
+        ],
+    )
+    def test_get_tables_returns_expected_keys(self, url, expected_tables):
+        tables = self.wiki.get_tables(url=url)
+
+        assert list(tables.keys()) == expected_tables
+
     def test_get_tables(self, mocker):
         url = (
             'https://en.wikipedia.org/wiki/'
             'COVID-19_pandemic_by_country_and_territory'
         )
-        wiki = self.wiki
 
-        tables = wiki.get_tables(url=url)
+        tables = self.wiki.get_tables(url=url)
 
         assert tables
         assert isinstance(tables, dict)
         assert tuple(tables.keys()) == (
-            f'COVID-19 pandemic by location {date.today().day} September 2020',
+            'COVID-19 pandemic by location 20 September 2020',
+            'COVID-19 cases and deaths by region, '
+            'in absolute figures and per million '
+            'inhabitants as of 5 September 2020',
             'First COVID-19 cases by country or territory',
             'States with no confirmed COVID-19 cases',
             'Partially recognized states with no confirmed cases',
@@ -305,11 +335,11 @@ class TestCache:
 
         assert self._get_cache_size(wiki) == 0
         # Make multiple calls to ensure no duplicate cache items created
-        assert wiki.find('Bob Marley') == wiki.find('Bob Marley')
+        assert self.wiki.find('Bob Marley') == self.wiki.find('Bob Marley')
         assert self._get_cache_size(wiki) == 1
 
         # Check cache keys are unique
-        assert wiki.find('Tom Hanks') != wiki.find('Bob Marley')
+        assert self.wiki.find('Tom Hanks') != self.wiki.find('Bob Marley')
 
         assert self._get_cache_size(wiki) == 2
         shutil.rmtree(wiki.cache_dir, ignore_errors=True)
@@ -318,7 +348,7 @@ class TestCache:
         wiki = WikiApi({'cache': False})
 
         assert self._get_cache_size(wiki) == 0
-        wiki.find('Bob Marley')
+        self.wiki.find('Bob Marley')
         assert self._get_cache_size(wiki) == 0
         shutil.rmtree(wiki.cache_dir, ignore_errors=True)
 
