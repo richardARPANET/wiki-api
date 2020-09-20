@@ -98,7 +98,7 @@ class TestWiki:
             (
                 'https://en.wikipedia.org/wiki/List_of_countries_and_'
                 'dependencies_by_population',
-                ['Countries and dependent territories by population'],
+                ['Sovereign states and dependencies by population'],
             ),
             (
                 'https://en.wikipedia.org/wiki/Influenza',
@@ -117,6 +117,10 @@ class TestWiki:
                     'FiNet Open Chess960',
                     # 'Chess960 Computer World Championship',
                 ],
+            ),
+            (
+                'https://en.wikipedia.org/wiki/List_of_missions_to_the_Moon',
+                ['Missions by date'],
             ),
         ],
     )

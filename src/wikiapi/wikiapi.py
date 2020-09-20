@@ -206,24 +206,25 @@ class WikiApi(object):
             try:
                 caption = table.find_all('caption')[0]
             except IndexError:
-                el = tuple(table.previous_siblings)[-1]
+                # import ipdb; ipdb.set_trace()
+                # el = tuple(table.previous_siblings)[-1]
+                # try:
+                #     classes = el.get_attribute_list(key='class')
+                # except AttributeError:
+                #     classes = []
+                # if 'shortdescription' in classes:
+                #     caption = el.text
+                # else:
+                # No caption attached to the table, fallback to nearest
+                # previous heading on the page
                 try:
-                    classes = el.get_attribute_list(key='class')
+                    caption = table.find_previous('h3').text
                 except AttributeError:
-                    classes = []
-                if 'shortdescription' in classes:
-                    caption = el.text
-                else:
-                    # No caption attached to the table, fallback to nearest
-                    # previous heading on the page
                     try:
-                        caption = table.find_previous('h3').text
+                        caption = table.find_previous('h2').text
                     except AttributeError:
-                        try:
-                            caption = table.find_previous('h2').text
-                        except AttributeError:
-                            logger.info('Could not find caption for table')
-                            continue
+                        logger.info('Could not find caption for table')
+                        continue
             else:
                 cap_children = tuple(caption.children)
                 caption = caption.text
