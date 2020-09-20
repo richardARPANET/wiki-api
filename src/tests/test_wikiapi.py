@@ -89,6 +89,7 @@ class TestWiki:
                 'https://en.wikipedia.org/wiki/World_population',
                 [
                     'Population by continent',
+                    '10 most populous countries',
                     '10 most densely populated countries',
                     'Countries ranking highly in both total population and '
                     'population density',
@@ -122,6 +123,9 @@ class TestWiki:
     def test_get_tables_returns_expected_keys(self, url, expected_tables):
         tables = self.wiki.get_tables(url=url)
 
+        import ipdb
+
+        ipdb.set_trace()
         assert list(tables.keys()) == expected_tables
 
     def test_get_tables(self, mocker):
