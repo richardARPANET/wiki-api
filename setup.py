@@ -29,7 +29,7 @@ setup(
     author="Richard O'Dwyer",
     author_email='richard@richard.do',
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
-    long_description='https://github.com/richardasaurus/wiki-api',
+    long_description='https://github.com/richardARPANET/wiki-api',
     install_requires=install_requires,
     classifiers=[
         'Intended Audience :: Developers',

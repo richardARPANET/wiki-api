@@ -6,7 +6,7 @@ Release History
 2.0.7 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Fix docs.
 
 
 2.0.6 (2020-09-20)
