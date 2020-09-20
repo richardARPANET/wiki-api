@@ -103,6 +103,20 @@ class TestWiki:
                 'https://en.wikipedia.org/wiki/Influenza',
                 [],
             ),
+            (
+                'https://en.wikipedia.org/wiki/Germany',
+                ['Constituent states']
+            ),
+            (
+                'https://en.wikipedia.org/wiki/Chess_Classic',
+                [
+                    'Chess Classic Championship',
+                    # 'Rapid Chess Open',
+                    # 'Chess960 Rapid chess World Championship',
+                    'FiNet Open Chess960',
+                    # 'Chess960 Computer World Championship',
+                ],
+            ),
         ],
     )
     def test_get_tables_returns_expected_keys(self, url, expected_tables):

@@ -6,7 +6,7 @@ Release History
 2.0.4 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Bugfix, ``get_tables`` method.
 
 
 2.0.3 (2020-09-20)

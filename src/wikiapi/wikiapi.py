@@ -200,16 +200,30 @@ class WikiApi(object):
 
         soup = BeautifulSoup(self.get(url), 'html.parser')
         tables = soup.find_all('table', class_='sortable')
+        if not tables:
+            tables = soup.find_all('table', class_='wikitable')
         for table in tables:
             try:
                 caption = table.find_all('caption')[0]
             except IndexError:
                 el = tuple(table.previous_siblings)[-1]
-                if 'shortdescription' in el.get_attribute_list(key='class'):
+                try:
+                    classes = el.get_attribute_list(key='class')
+                except AttributeError:
+                    classes = []
+                if 'shortdescription' in classes:
                     caption = el.text
                 else:
-                    logger.info('Could not find caption for table')
-                    continue
+                    # No caption attached to the table, fallback to nearest
+                    # previous heading on the page
+                    try:
+                        caption = table.find_previous('h3').text
+                    except AttributeError:
+                        try:
+                            caption = table.find_previous('h2').text
+                        except AttributeError:
+                            logger.info('Could not find caption for table')
+                            continue
             else:
                 cap_children = tuple(caption.children)
                 caption = caption.text
