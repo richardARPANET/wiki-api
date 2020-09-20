@@ -122,6 +122,11 @@ class TestWiki:
                 'https://en.wikipedia.org/wiki/List_of_missions_to_the_Moon',
                 ['Missions by date'],
             ),
+            (
+                'https://en.wikipedia.org/wiki/'
+                'List_of_people_who_have_walked_on_the_Moon',
+                ['Moonwalkers'],
+            )
         ],
     )
     def test_get_tables_returns_expected_keys(self, url, expected_tables):

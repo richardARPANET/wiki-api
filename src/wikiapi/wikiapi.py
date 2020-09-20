@@ -260,6 +260,14 @@ class WikiApi(object):
                         + (th,)
                         + tuple(th.next_siblings)
                     )
+                    headings = [
+                        self._strip_text(x.text).strip()
+                        for x in ths
+                        if hasattr(x, 'text')
+                    ]
+                    ths2 = table.find_all('th')
+                    if len(ths2) == len(headings):
+                        ths = ths2
             headings = [
                 self._strip_text(x.text).strip()
                 for x in ths
