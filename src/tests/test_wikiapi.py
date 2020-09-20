@@ -335,11 +335,11 @@ class TestCache:
 
         assert self._get_cache_size(wiki) == 0
         # Make multiple calls to ensure no duplicate cache items created
-        assert self.wiki.find('Bob Marley') == self.wiki.find('Bob Marley')
+        assert wiki.find('Bob Marley') == wiki.find('Bob Marley')
         assert self._get_cache_size(wiki) == 1
 
         # Check cache keys are unique
-        assert self.wiki.find('Tom Hanks') != self.wiki.find('Bob Marley')
+        assert wiki.find('Tom Hanks') != wiki.find('Bob Marley')
 
         assert self._get_cache_size(wiki) == 2
         shutil.rmtree(wiki.cache_dir, ignore_errors=True)
@@ -348,7 +348,7 @@ class TestCache:
         wiki = WikiApi({'cache': False})
 
         assert self._get_cache_size(wiki) == 0
-        self.wiki.find('Bob Marley')
+        wiki.find('Bob Marley')
         assert self._get_cache_size(wiki) == 0
         shutil.rmtree(wiki.cache_dir, ignore_errors=True)
 
