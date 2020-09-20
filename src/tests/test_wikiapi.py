@@ -123,9 +123,6 @@ class TestWiki:
     def test_get_tables_returns_expected_keys(self, url, expected_tables):
         tables = self.wiki.get_tables(url=url)
 
-        import ipdb
-
-        ipdb.set_trace()
         assert list(tables.keys()) == expected_tables
 
     def test_get_tables(self, mocker):
