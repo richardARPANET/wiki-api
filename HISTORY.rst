@@ -6,7 +6,7 @@ Release History
 2.0.8 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Widen six dependency versions allowed.
 
 
 2.0.7 (2020-09-20)
