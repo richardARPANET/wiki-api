@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-2.0.8 (unreleased)
+2.0.8 (2021-06-05)
 ++++++++++++++++++
 
 - Widen six dependency versions allowed.
