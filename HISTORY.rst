@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-2.1.0 (unreleased)
+2.1.0 (2025-03-30)
 ++++++++++++++++++
 
 - Allow wider dependency versions.
