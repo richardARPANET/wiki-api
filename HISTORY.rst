@@ -3,10 +3,11 @@
 Release History
 ---------------
 
-2.0.9 (unreleased)
+2.1.0 (unreleased)
 ++++++++++++++++++
 
-- Nothing changed yet.
+- Allow wider dependency versions.
+- Bugfix, ``get_tables`` method.
 
 
 2.0.8 (2021-06-05)
