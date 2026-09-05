@@ -17,7 +17,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='wikiapi',
-    version='2.1.0',
+    version='2.1.1',
     packages=find_packages('src', exclude=('tests',)),
     package_dir={'': 'src'},
     include_package_data=True,
