@@ -13,6 +13,12 @@ from pyquery import PyQuery
 
 logger = logging.getLogger(__name__)
 
+USER_AGENT = (
+    "WikiApi/2.1.1 (https://github.com/richardARPANET/wiki-api; "
+    "hello@sheet2api.com)"
+)
+REQUEST_TIMEOUT = 30
+
 uri_scheme = "https"
 api_uri = "wikipedia.org/w/api.php"
 article_uri = "wikipedia.org/wiki/"
@@ -178,7 +184,13 @@ class WikiApi(object):
             if cached_resp:
                 return cached_resp
 
-        resp = requests.get(url, params=params)
+        resp = requests.get(
+            url,
+            params=params,
+            headers={"User-Agent": USER_AGENT},
+            timeout=REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
         resp_content = resp.content
 
         if self.caching_enabled:
